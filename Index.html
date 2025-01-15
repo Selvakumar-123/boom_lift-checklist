@@ -1,0 +1,145 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scissor Lift Checklist</title>
+    <style>
+        .signature-pad {
+            border: 1px solid #000;
+            width: 300px;
+            height: 150px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Scissor Lift Checklist</h1>
+    <form id="checklistForm">
+        <!-- Checklist items -->
+        <h3>Fluids: Check the oil, hydraulic, fuel, and coolant levels, and look for leaks</h3>
+        <label><input type="radio" name="operating_controls" value="Yes" required> Yes</label>
+        <label><input type="radio" name="operating_controls" value="No"> No</label>
+        <label><input type="radio" name="operating_controls" value="NA"> N/A</label>
+        <h3>Emergency lowering function operates properly:</h3>
+        <label><input type="radio" name="emergency_lowering" value="Yes" required> Yes</label>
+        <label><input type="radio" name="emergency_lowering" value="No"> No</label>
+        <label><input type="radio" name="emergency_lowering" value="NA"> N/A</label>
+
+        <h3>Wheels and tires: Check the condition of the wheels and tires</h3>
+        <label><input type="radio" name="override_controls" value="Yes" required> Yes</label>
+        <label><input type="radio" name="override_controls" value="No"> No</label>
+        <label><input type="radio" name="override_controls" value="NA"> N/A</label>
+
+        <h3>Controls: Check that the controls and brakes are working properly</h3>
+        <label><input type="radio" name="protected_controls" value="Yes" required> Yes</label>
+        <label><input type="radio" name="protected_controls" value="No"> No</label>
+        <label><input type="radio" name="protected_controls" value="NA"> N/A</label>
+
+        <h3>Safety locks: Check that the guardrails and safety locks are in place</h3>
+        <label><input type="radio" name="control_panel" value="Yes" required> Yes</label>
+        <label><input type="radio" name="control_panel" value="No"> No</label>
+        <label><input type="radio" name="control_panel" value="NA"> N/A</label>
+
+        <h3>Work platform: Check that the work platform is clear of debris</h3>
+        <label><input type="radio" name="switch_guards" value="Yes" required> Yes</label>
+        <label><input type="radio" name="switch_guards" value="No"> No</label>
+        <label><input type="radio" name="switch_guards" value="NA"> N/A</label>
+
+        <h3>Emergency controls: Check that the emergency controls work</h3>
+        <label><input type="radio" name="indicator_lights" value="Yes" required> Yes</label>
+        <label><input type="radio" name="indicator_lights" value="No"> No</label>
+        <label><input type="radio" name="indicator_lights" value="NA"> N/A</label>
+
+  
+
+        <h3>Warning devices: Check that the horns, gauges, lights, and backup alarms are working</h3>
+        <label><input type="radio" name="battery_charged" value="Yes" required> Yes</label>
+        <label><input type="radio" name="battery_charged" value="No"> No</label>
+        <label><input type="radio" name="battery_charged" value="NA"> N/A</label>
+
+        <h3>Personal protective equipment is in use (hard hat, fall arrest harness, etc.):</h3>
+        <label><input type="radio" name="ppe_in_use" value="Yes" required> Yes</label>
+        <label><input type="radio" name="ppe_in_use" value="No"> No</label>
+        <label><input type="radio" name="ppe_in_use" value="NA"> N/A</label>
+
+        <h3>Watch for vehicular and pedestrian traffic:</h3>
+        <label><input type="radio" name="traffic_watch" value="Yes" required> Yes</label>
+        <label><input type="radio" name="traffic_watch" value="No"> No</label>
+        <label><input type="radio" name="traffic_watch" value="NA"> N/A</label>
+
+        <!-- Additional Information -->
+        <h3>Name: <input type="text" name="name" required></h3>
+        <h3>Company: <input type="text" name="company" required></h3>
+        <h3>Scissor Lift Number:</h3>
+        <select name="lift_number" required>
+            <option value="">Select a lift number</option>
+           <option value="10BLF00041">10BLF00041</option>
+            <option value="BL 1037">BL 1037</option>
+            <option value="BL 1025">BL 1025</option>
+        </select>
+        
+
+
+        <h3>Signature:</h3>
+        <canvas id="signaturePad" class="signature-pad"></canvas>
+        <button type="button" onclick="clearSignature()">Clear</button>
+
+        <br><br>
+        <input type="submit" value="Submit">
+        
+    <script>
+        const signaturePad = document.getElementById('signaturePad');
+        const context = signaturePad.getContext('2d');
+        let isDrawing = false;
+
+        signaturePad.addEventListener('mousedown', startDrawing);
+        signaturePad.addEventListener('mousemove', draw);
+        signaturePad.addEventListener('mouseup', stopDrawing);
+        signaturePad.addEventListener('mouseout', stopDrawing);
+
+        function startDrawing(event) {
+            isDrawing = true;
+            context.beginPath();
+            context.moveTo(event.offsetX, event.offsetY);
+        }
+
+        function draw(event) {
+            if (!isDrawing) return;
+            context.lineTo(event.offsetX, event.offsetY);
+            context.stroke();
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function clearSignature() {
+            context.clearRect(0, 0, signaturePad.width, signaturePad.height);
+        }
+
+        document.getElementById('checklistForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const signatureData = signaturePad.toDataURL();
+        formData.append('signature', signatureData);
+
+        fetch('https://script.google.com/macros/s/AKfycbxci4J2tu-1MTfa6iBh5rz5Xg4aKi8UdkA9iIUn4Qd8r_sREuUcX3ysWJ7KkrdhKnd8/exec', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert('Form submitted successfully!');
+            event.target.reset();
+            clearSignature();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('There was an error submitting the form.');
+        });
+    });
+    </script>
+        <script src="script.js"></script>
+</body>
+</html>
